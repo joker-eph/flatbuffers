@@ -540,7 +540,10 @@ class FlatBufferBuilder {
     // See if we already have generated a vtable with this exact same
     // layout before. If so, make it point to the old one, remove this one.
     for (auto it = vtables_.begin(); it != vtables_.end(); ++it) {
-      if (memcmp(buf_.data_at(*it), vt1, vt1_size)) continue;
+      auto data_loc = reinterpret_cast<voffset_t *>(buf_.data_at(*it));
+      if (!vt1_size ||
+          *data_loc != *vt1 ||
+          memcmp(data_loc+1, vt1+1, vt1_size - sizeof(voffset_t)) continue;
       vt_use = *it;
       buf_.pop(GetSize() - vtableoffsetloc);
       break;
